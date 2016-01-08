@@ -1,0 +1,90 @@
+
+a {
+    text-decoration: none;
+}
+
+a.deleteLink, a.editLink {
+    color: red;
+    cursor: pointer;
+}
+
+a.editLink {
+    color: black;
+}
+
+ul.pointsList {
+    margin: 30px;
+    float: left;
+    width: 300px;
+}
+
+ul.pointsList > li {
+    padding-bottom: 2px;
+}
+
+#map {
+    height: 500px;
+    width: 800px;
+    margin: 20px 0 0 20px !important;
+    float: left;
+}
+.custom-panel {
+    width: auto; // 131
+height: 54px;
+    cursor: pointer;
+    right: 10px;
+    top: 10px;
+}
+
+.addMarkerControlItemInactive {
+    top: 8px;
+    left: 8px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.addMarkerControlItemActive {
+    top: 8px;
+    left: 8px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 4px;
+    padding: 2px;
+}
+p.buttonInnerText {
+    display: block;
+    margin: 1px;
+    padding: 0 2px 0 2px;
+    color: white;
+    font-size: 18px;
+    font-family: 'Lucida Grande', Verdana, Geneva, Lucida, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    height: 22px;
+    width: auto; //125
+line-height: 19px;
+    background: rgba(0, 60, 136, 0.5);
+}
+.popup_msg{
+    position:absolute;
+    z-index:10;
+    width:172px;
+    height:102px;
+    text-align:center;
+    color:#FF0000;
+    font: 14px Verdana, Arial, Helvetica, sans-serif;
+    display:none;
+}
+
+div.editMarkerTemplate {
+    display: none;
+}
+
+div.editMarkerBlock {
+    float: left;
+}
+
+div.editMarkerBlock form > div input {
+    width: 300px;
+}

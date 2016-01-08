@@ -1,277 +1,14 @@
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>DefLoc</title>
-
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="css/reset.css">
-
+    <link rel="stylesheet" href="css/main.css">
     <script src="http://openlayers.org/api/OpenLayers.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-
-
-    <style>
-
-        a {
-            text-decoration: none;
-        }
-
-        a.deleteLink, a.editLink {
-            color: red;
-            cursor: pointer;
-        }
-
-        a.editLink {
-            color: black;
-        }
-
-        ul.pointsList {
-            margin: 30px;
-            float: left;
-            width: 300px;
-        }
-
-        ul.pointsList > li {
-            padding-bottom: 2px;
-        }
-
-        #map {
-            height: 500px;
-            width: 800px;
-            margin: 20px 0 0 20px !important;
-            float: left;
-        }
-        .custom-panel {
-            width: auto; // 131
-            height: 54px;
-            cursor: pointer;
-            right: 10px;
-            top: 10px;
-        }
-
-        .addMarkerControlItemInactive {
-            top: 8px;
-            left: 8px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 4px;
-            padding: 2px;
-        }
-
-        .addMarkerControlItemActive {
-            top: 8px;
-            left: 8px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 4px;
-            padding: 2px;
-        }
-        p.buttonInnerText {
-            display: block;
-            margin: 1px;
-            padding: 0 2px 0 2px;
-            color: white;
-            font-size: 18px;
-            font-family: 'Lucida Grande', Verdana, Geneva, Lucida, Arial, Helvetica, sans-serif;
-            font-weight: bold;
-            text-decoration: none;
-            text-align: center;
-            height: 22px;
-            width: auto; //125
-            line-height: 19px;
-            background: rgba(0, 60, 136, 0.5);
-        }
-        .popup_msg{
-            position:absolute;
-            z-index:10;
-            width:172px;
-            height:102px;
-            text-align:center;
-            color:#FF0000;
-            font: 14px Verdana, Arial, Helvetica, sans-serif;
-            display:none;
-        }
-
-        div.editMarkerTemplate {
-            display: none;
-        }
-
-        div.editMarkerBlock {
-            float: left;
-        }
-
-        div.editMarkerBlock form > div input {
-            width: 300px;
-        }
-
-    </style>
-
-    <script type="text/javascript">
-        (function($){
-            $(function(){
-                var lat=34.070;
-                var lon=-118.73;
-                var zoom=5;
-                var map;
-                var points = {};
-
-                $("a#submitMarkerForm").on("click", function(e){
-                    var nameSelector = $("#markerName");
-                    var name = nameSelector.val();
-                    if (name !== "") {
-                        nameSelector.val("");
-                        var position = new OpenLayers.Geometry.Point(lon, lat);
-                        var markerVector = new OpenLayers.Feature.Vector(position, { tooltip: name, title: name });
-                        points[name] = markerVector;
-                        marker.addFeatures([
-                            markerVector
-                        ]);
-
-
-                        var mainLink = $("<a>").text(name).addClass("editLink");
-                        mainLink.on("click", function(e) {
-                            var template = $("div.editMarkerTemplate").html();
-                            $("div.editMarkerBlock").html(template.replace("%s", name));
-                        });
-
-                        var deleteLink = $("<a>").text(" X ").addClass("deleteLink");
-                        deleteLink.on("click", function(e) {
-                            e.preventDefault();
-                            var id = $(this).parent().attr("data-vector-id");
-                            marker.removeFeatures([marker.getFeatureById(id)]);
-                            $(this).parent().remove();
-                        });
-
-                        $("ul.pointsList").append($("<li>").attr("data-vector-id", markerVector.id).append(mainLink).append(deleteLink));
-
-
-                    } else {
-                        e.preventDefault();
-                    }
-                });
-
-
-
-                var marker = new OpenLayers.Layer.Vector("Marker", {
-                    styleMap: new OpenLayers.StyleMap({
-                        externalGraphic: "img/marker.png",
-                        graphicWidth: 50,
-                        graphicHeight: 50,
-                        graphicYOffset: -50
-                    })
-                });
-
-                OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
-                    defaultHandlerOptions: {
-                        'single' : true,
-                        'double' : false,
-                        'pixelTolerance' : 0,
-                        'stopSingle' : false,
-                        'stopDouble' : false
-                    },
-                    initialize: function(options) {
-                        this.handlerOptions = OpenLayers.Util.extend({}, this.defaultHandlerOptions);
-                        OpenLayers.Control.prototype.initialize.apply(this, arguments);
-                        this.handler = new OpenLayers.Handler.Click(this, {
-                                'click': this.trigger
-                            },
-                            this.handlerOptions
-                        );
-                    },
-                    trigger: function(pos) {
-                        var lonLat = map.getLonLatFromPixel(pos.xy);
-                        click.deactivate();
-                        var popupLink = $("a[href='#addMarkerPopup']");
-                        $("div#map").css('cursor', 'default');
-                        lat = lonLat.lat;
-                        lon = lonLat.lon;
-                        popupLink.click();
-                    }
-                });
-                var click = new OpenLayers.Control.Click();
-
-                var addMarkerAction = function() {
-                    $("div#map").css('cursor', 'crosshair');
-                    click.activate();
-                };
-
-                function init(){
-                    var tooltipPopup = $("div#tooltipPopup");
-                    map = new OpenLayers.Map ({
-                        div: "map",
-                        projection: "EPSG:3857",
-                        /*eventListeners: {
-                            featureover: function(e) {
-                                console.log("featureover: " + e.feature.attributes.title)
-                            },
-                            featureout: function(e) {
-                                console.log("featureout: " + e.feature.attributes.title)
-                            },
-                            featureclick: function(e) {
-                                console.log("featureclick: " + e.feature.attributes.title)
-                            }
-                        }*/
-                    });
-
-                    var panel = new OpenLayers.Control.Panel({
-                        displayClass: 'custom-panel'
-                    });
-                    map.addControl(panel);
-
-                    var addMarkerControl = new OpenLayers.Control.Button({
-                        displayClass: 'addMarkerControl',
-                        trigger: addMarkerAction,
-                        type: OpenLayers.Control.TYPE_BUTTON
-                    });
-
-                    panel.addControls([addMarkerControl]);
-
-                    $('div.addMarkerControlItemInactive').append($('<p/>').addClass("buttonInnerText").text('Add marker'));
-
-                    var drag = new OpenLayers.Control.DragFeature(marker, {
-                        autoActivate: true,
-                        onComplete: function() {
-                            //alert("Hello");
-                        }
-                    });
-                    map.addControl(drag);
-
-                    map.addLayers([new OpenLayers.Layer.OSM(), marker]); //OSM base map
-                    var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
-                    map.setCenter (lonLat, zoom);
-                    map.addControl(click);
-
-                }
-
-                var position = function getCurrentLocation() {
-                    if (navigator.geolocation) { // success
-                        navigator.geolocation.getCurrentPosition(
-                            function(data) {
-                                lat = data.coords.latitude;
-                                lon = data.coords.longitude;
-                                zoom = 15;
-                                init();
-                            },
-                            function(error) { // error
-                                console.log("Error! ", error);
-                                init();
-                            },
-                            { // options
-                                enableHighAccuracy : true,
-                                timeout : 5000,
-                                maximumAge : 0
-                            }
-                        );
-                    }
-                };
-                position();
-            });
-        })(jQuery);
-
-
-
-    </script>
+    <script src="js/app.js"></script>
 </head>
 <body>
 
@@ -281,14 +18,16 @@
 <div class="editMarkerBlock"></div>
 
 
-
 <a href="#addMarkerPopup" data-rel="popup"></a>
-<div data-role="popup" id="addMarkerPopup" class="ui-content" data-dismissible="false" data-position-to="#map" style="min-width:250px;">
+
+<div data-role="popup" id="addMarkerPopup" class="ui-content" data-dismissible="false" data-position-to="#map"
+     style="min-width:250px;">
     <div>
         <h3>Specify marker name</h3>
         <label for="markerName" class="ui-hidden-accessible">Marker name:</label>
         <input type="text" name="marker" id="markerName" placeholder="Name">
-        <a href="#" id="submitMarkerForm" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Place marker</a>
+        <a href="#" id="submitMarkerForm" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Place
+            marker</a>
         <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Go Back</a>
     </div>
 </div>
