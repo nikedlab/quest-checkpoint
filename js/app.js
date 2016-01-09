@@ -2,6 +2,50 @@
  * Created by Vlad on 09.01.2016.
  */
 (function($){
+    /**
+     * Bla bla
+     * @private
+     */
+    function _ui() {
+        this.showTooltip = function (relativeElement) {
+            console.log(relativeElement.offsetLeft,relativeElement.offsetTop);
+            var tpl = "<div data-type=\"ui-tooltip\"><p>I'm tooltip</p></div>",
+                elBody = $('body');
+            elBody.append($(tpl));
+            elBody.find('[data-type="ui-tooltip"]')
+                .css({
+                    'left': relativeElement.offsetLeft,
+                    'top': (relativeElement.offsetTop - relativeElement.outerHeight()),//maybe need to add somecentring
+                    'position': 'fixed'
+                });
+        };
+        /**
+         * @param tooltip
+         */
+        this.hideTooltip = function (tooltip) {
+            if (tooltip !== undefined && typeof tooltip === "object") {
+                tooltip.remove();
+                return true;
+            } else {
+                $('body').find('[data-type="ui-tooltip"]')
+                    .remove();
+            }
+        }
+    }
+
+    var appEvents = {},
+        evnt = {marker: {hover: 'app.event.marker.hover', 'leave': 'app.event.marker.leave'}},
+        ui = (new function () {
+
+        }).prototype = new _ui();
+
+    $(appEvents).on(evnt.marker.hover, function (event, data) {
+        console.log(data);
+        ui.showTooltip($('#' + data.element.id));
+    });
+    $(appEvents).on(evnt.marker['leave'], function (event, data) {
+        ui.hideTooltip();
+    });
     $(function(){
         var lat=34.070;
         var lon=-118.73;
