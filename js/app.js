@@ -2,7 +2,7 @@
  * Created by Vlad on 09.01.2016.
  */
 (function($){
-    /**
+    /**e
      * Bla bla
      * @private
      */
